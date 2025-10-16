@@ -12,6 +12,7 @@ void readLine(char text[], int size);
 
 int distances[MAX_CITIES][MAX_CITIES];
 void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount);
+void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 
 int main()
 {
@@ -236,7 +237,7 @@ void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount)
         switch (choice)
         {
         case 1:
-            printf("Distance input/edit will be added.\n");
+            inputEditDistance(cities,cityCount);
             break;
 
         case 2:
@@ -246,18 +247,17 @@ void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount)
                 break;
             }
             printf("\n--- Distance Table ---\n");
-            printf("    ");
+            printf("%-15s","");
             for (int i = 0; i < cityCount; i++)
-                printf("%5s", cities[i]);
+                printf("%-15s", cities[i]);
             printf("\n");
 
             for (int i = 0; i < cityCount; i++)
             {
-                printf("%-5s", cities[i]);
+                printf("%-15s", cities[i]);
                 for (int j = 0; j < cityCount; j++)
-                {
-                    printf("%5d", distances[i][j]);
-                }
+
+                    printf("%-15d", distances[i][j]);
                 printf("\n");
             }
             break;
@@ -269,10 +269,39 @@ void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount)
         default:
             printf("Invalid choice! Try again.\n");
         }
-    } while (choice != 3);
+    }
+    while (choice != 3);
 }
+void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount)
+{
+    if(cityCount < 2)
+    {
+        printf("At least add 2 cities.\n");
+        return;
+    }
 
+    int from, to, dist;
+    displayCities(cities,cityCount);
 
+    printf("From city number: ");
+    scanf("%d", &from);
+    printf("To city number: ");
+    scanf("%d", &to);
+
+    if(from < 1 || from > cityCount || to < 1 || to > cityCount || from == to)
+    {
+        printf("Invalid city numbers!\n");
+        return;
+    }
+
+    printf("Enter distance (km): ");
+    scanf("%d", &dist);
+
+    distances[from-1][to-1] = dist;
+    distances[to-1][from-1] = dist;
+    printf("Distance updated Successfully..!\n");
+
+}
 
 
 
