@@ -2,6 +2,9 @@
 
 #define MAX_CITIES 30
 #define NAME_CITY 50
+#define VH_TYPES 5
+
+
 
 void cityManagement(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void addCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
@@ -9,6 +12,8 @@ void renameCity(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void removeCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void displayCities(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void readLine(char text[], int size);
+void vehicleManagement();
+
 
 int distances[MAX_CITIES][MAX_CITIES];
 void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount);
@@ -41,7 +46,7 @@ int main()
             distanceManagement(cities, cityCount);
             break;
         case 3:
-            printf("Vehicle Management selected.\n");
+            vehicleManagement();
             break;
         case 4:
             printf("Delivery Request selected.\n");
@@ -301,6 +306,23 @@ void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount)
     distances[to-1][from-1] = dist;
     printf("Distance updated Successfully..!\n");
 
+}
+
+char vehicleNames[VH_TYPES][30] = {"Car", "Van", "bus","Lorry","Truck"};
+int vehicleRate[VH_TYPES] = {40,20,10,30,25};
+int vehicleCapacity[VH_TYPES] = {3000, 1300, 5000,6000,7000};
+int vehicleSpeed[VH_TYPES] = {60, 80, 100,70,80};
+int vehicleFuel[VH_TYPES] = {12, 6, 14,10,15};
+
+void vehicleManagement() {
+    printf("\n--- Vehicle Management ---\n");
+    for (int i = 0; i < VH_TYPES; i++) {
+        printf("%d. %s\n", i + 1, vehicleNames[i]);
+        printf("  Vehicle Capacity: %d kg\n", vehicleCapacity[i]);
+        printf("  Vehicle Rate: %d per km\n", vehicleRate[i]);
+        printf("  Vehicle Speed: %d km/h\n", vehicleSpeed[i]);
+        printf("  Vehicle Fuel Efficiency: %d km/l\n\n", vehicleFuel[i]);
+    }
 }
 
 
