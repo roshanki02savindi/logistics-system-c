@@ -3,6 +3,7 @@
 #define MAX_CITIES 30
 #define NAME_CITY 50
 #define VH_TYPES 3
+#define MAX_DELIVERIES 50
 
 
 
@@ -13,18 +14,20 @@ void removeCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void displayCities(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void readLine(char text[], int size);
 void vehicleManagement();
+void deliveryRequest();
 
+char cities[MAX_CITIES][NAME_CITY];
+int cityCount = 0;
 
 int distances[MAX_CITIES][MAX_CITIES];
 void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void displayVehicleOption();
-
+int deliverySource[MAX_DELIVERIES], deliveryDestination[MAX_DELIVERIES], deliveryWeight[MAX_DELIVERIES], deliveryVehicle[MAX_DELIVERIES];
+int deliveryCount = 0;
 int main()
 {
     int choice;
-    char cities[MAX_CITIES][NAME_CITY];
-    int cityCount = 0;
 
     while (1)
     {
@@ -51,7 +54,7 @@ int main()
             displayVehicleOption();
             break;
         case 4:
-            printf("Delivery Request selected.\n");
+            deliveryRequest();
             break;
         case 5:
             printf("Reports selected.\n");
@@ -316,14 +319,16 @@ int vehicleCapacity[VH_TYPES] = {1000, 5000, 10000};
 int vehicleSpeed[VH_TYPES] = {60, 80, 100};
 int vehicleFuel[VH_TYPES] = {12, 6, 4};
 
-void vehicleManagement() {
+void vehicleManagement()
+{
     printf("              VEHICLE MANAGEMENT TABLE\n");
     printf("------------------------------------------------------------\n");
     printf("%-10s %-15s %-15s %-15s %-10s\n",
            "Type", "Capacity(kg)", "Rate/km(LKR)", "Speed(km/h)", "Fuel(km/l)");
     printf("------------------------------------------------------------\n");
 
-    for (int i = 0; i < VH_TYPES; i++) {
+    for (int i = 0; i < VH_TYPES; i++)
+    {
         printf("%-10s %-15d %-15d %-15d %-10d\n",
                vehicleNames[i], vehicleCapacity[i],
                vehicleRate[i], vehicleSpeed[i], vehicleFuel[i]);
@@ -332,18 +337,21 @@ void vehicleManagement() {
     printf("------------------------------------------------------------\n");
 }
 
-  void displayVehicleOption() {
+void displayVehicleOption()
+{
     int select;
 
     printf("\n*** Choose Your Vehicle ***\n");
-    for (int i = 0; i < VH_TYPES; i++) {
+    for (int i = 0; i < VH_TYPES; i++)
+    {
         printf("%d: %s\n", i + 1, vehicleNames[i]);
     }
 
     printf("Enter your Vehicle choice: ");
     scanf("%d", &select);
 
-    if (select < 1 || select > VH_TYPES) {
+    if (select < 1 || select > VH_TYPES)
+    {
         printf("Not a valid option.\n");
         return;
     }
@@ -357,7 +365,57 @@ void vehicleManagement() {
     printf("Fuel Efficiency: %d km/l\n", vehicleFuel[index]);
 }
 
+void deliveryRequest()
+{
 
+    if(cityCount < 2)
+    {
+        printf("Add at least 2 cities before to create a delivery request.\n");
+        return;
+    }
+    if(deliveryCount >= MAX_DELIVERIES)
+    {
+        printf("Maximum delivery limit reached!\n");
+        return;
+    }
+
+    int source, dest, weight, vhtype;
+     displayCities(cities,cityCount);
+
+    printf("Enter start city number: ");
+    scanf("%d", &source);
+    printf("Enter destination city number: ");
+    scanf("%d", &dest);
+    if(source < 1 || source > cityCount || dest < 1 || dest > cityCount || source == dest)
+    {
+        printf("Invalid start or destination city!\n");
+        return;
+    }
+
+    printf("Enter package weight in Kg: ");
+    scanf("%d", &weight);
+
+    displayVehicleOption();
+    printf("Enter vehicle number: ");
+    scanf("%d", &vhtype);
+    if(vhtype < 1 || vhtype > VH_TYPES)
+    {
+        printf("Invalid vehicle selection!\n");
+        return;
+    }
+    if(weight > vehicleCapacity[vhtype-1])
+    {
+        printf("Weight exceeds selected vehicle capacity!\n");
+        return;
+    }
+
+    deliverySource[deliveryCount] = source - 1;
+    deliveryDestination[deliveryCount] = dest - 1;
+    deliveryWeight[deliveryCount] = weight;
+    deliveryVehicle[deliveryCount] = vhtype - 1;
+    deliveryCount++;
+    printf("Delivery Request Added successfully!\n");
+}
 
 
 
