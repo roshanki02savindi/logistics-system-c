@@ -18,6 +18,7 @@ void vehicleManagement();
 int distances[MAX_CITIES][MAX_CITIES];
 void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount);
+void displayVehicleOption();
 
 int main()
 {
@@ -47,6 +48,7 @@ int main()
             break;
         case 3:
             vehicleManagement();
+            displayVehicleOption();
             break;
         case 4:
             printf("Delivery Request selected.\n");
@@ -329,5 +331,34 @@ void vehicleManagement() {
 
     printf("------------------------------------------------------------\n");
 }
+
+  void displayVehicleOption() {
+    int select;
+
+    printf("\n*** Choose Your Vehicle ***\n");
+    for (int i = 0; i < VH_TYPES; i++) {
+        printf("%d: %s\n", i + 1, vehicleNames[i]);
+    }
+
+    printf("Enter your Vehicle choice: ");
+    scanf("%d", &select);
+
+    if (select < 1 || select > VH_TYPES) {
+        printf("Not a valid option.\n");
+        return;
+    }
+
+    int index = select - 1;
+    printf("\n+++ Vehicle Information +++\n");
+    printf("TYPE: %s\n", vehicleNames[index]);
+    printf("Capacity: %d kg\n", vehicleCapacity[index]);
+    printf("Rate per km: %d LKR\n", vehicleRate[index]);
+    printf("Average Speed: %d km/h\n", vehicleSpeed[index]);
+    printf("Fuel Efficiency: %d km/l\n", vehicleFuel[index]);
+}
+
+
+
+
 
 
