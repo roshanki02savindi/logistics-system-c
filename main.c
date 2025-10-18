@@ -2,7 +2,7 @@
 
 #define MAX_CITIES 30
 #define NAME_CITY 50
-#define VH_TYPES 5
+#define VH_TYPES 3
 
 
 
@@ -308,22 +308,26 @@ void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount)
 
 }
 
-char vehicleNames[VH_TYPES][30] = {"Car", "Van", "bus","Lorry","Truck"};
-int vehicleRate[VH_TYPES] = {40,20,10,30,25};
-int vehicleCapacity[VH_TYPES] = {3000, 1300, 5000,6000,7000};
-int vehicleSpeed[VH_TYPES] = {60, 80, 100,70,80};
-int vehicleFuel[VH_TYPES] = {12, 6, 14,10,15};
+char vehicleNames[VH_TYPES][20] = {"Van","Truck","Lorry"};
+int vehicleRate[VH_TYPES] = {30,40,50};
+int vehicleCapacity[VH_TYPES] = {1000, 5000, 10000};
+int vehicleSpeed[VH_TYPES] = {60, 80, 100};
+int vehicleFuel[VH_TYPES] = {12, 6, 4};
 
 void vehicleManagement() {
-    printf("\n--- Vehicle Management ---\n");
-    for (int i = 0; i < VH_TYPES; i++) {
-        printf("%d. %s\n", i + 1, vehicleNames[i]);
-        printf("  Vehicle Capacity: %d kg\n", vehicleCapacity[i]);
-        printf("  Vehicle Rate: %d per km\n", vehicleRate[i]);
-        printf("  Vehicle Speed: %d km/h\n", vehicleSpeed[i]);
-        printf("  Vehicle Fuel Efficiency: %d km/l\n\n", vehicleFuel[i]);
-    }
-}
+    printf("              VEHICLE MANAGEMENT TABLE\n");
+    printf("------------------------------------------------------------\n");
+    printf("%-10s %-15s %-15s %-15s %-10s\n",
+           "Type", "Capacity(kg)", "Rate/km(LKR)", "Speed(km/h)", "Fuel(km/l)");
+    printf("------------------------------------------------------------\n");
 
+    for (int i = 0; i < VH_TYPES; i++) {
+        printf("%-10s %-15d %-15d %-15d %-10d\n",
+               vehicleNames[i], vehicleCapacity[i],
+               vehicleRate[i], vehicleSpeed[i], vehicleFuel[i]);
+    }
+
+    printf("------------------------------------------------------------\n");
+}
 
 
