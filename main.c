@@ -18,6 +18,7 @@ void readLine(char text[], int size);
 void vehicleManagement();
 void deliveryRequest();
 
+
 char cities[MAX_CITIES][NAME_CITY];
 int cityCount = 0;
 
@@ -28,6 +29,9 @@ void displayVehicleOption();
 int deliverySource[MAX_DELIVERIES], deliveryDestination[MAX_DELIVERIES], deliveryWeight[MAX_DELIVERIES], deliveryVehicle[MAX_DELIVERIES];
 int deliveryCount = 0;
 void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_CITIES][NAME_CITY]);
+void printDeliveryReports(char cities[MAX_CITIES][NAME_CITY], int deliveryCount);
+
+
 int main()
 {
     int choice;
@@ -60,7 +64,7 @@ int main()
             deliveryRequest(cities,cityCount);
             break;
         case 5:
-            printf("Reports selected.\n");
+            printDeliveryReports(cities,deliveryCount);
             break;
         case 6:
             printf("Exiting program.\n");
@@ -383,7 +387,7 @@ void deliveryRequest()
     }
 
     int source, dest, weight, vhtype;
-     displayCities(cities,cityCount);
+    displayCities(cities,cityCount);
 
     printf("Enter start city number: ");
     scanf("%d", &source);
@@ -419,7 +423,8 @@ void deliveryRequest()
     deliveryCount++;
     printf("Delivery Request Added successfully!\n");
 }
-void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_CITIES][NAME_CITY]) {
+void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_CITIES][NAME_CITY])
+{
     int dist = distances[source][dest];
 
     float baseCost = dist * vehicleRate[vhtype] * (1 + (float)weight / 10000);
@@ -449,6 +454,44 @@ void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_C
     printf("Estimated Time: %.2f hours\n", time);
     printf("======================================================\n");
 }
+
+void printDeliveryReports(char cities[MAX_CITIES][NAME_CITY], int deliveryCount)
+{
+    if (deliveryCount == 0)
+    {
+        printf("\n Delivery Record Not Found \n");
+        return;
+    }
+
+    printf("\n===========================================================================================\n");
+    printf("                    DELIVERY REPORTS                  \n");
+    printf("--------------------------------------------------------------------------------------------\n");
+    printf("%-5s %-15s %-15s %-10s %-10s %-10s %-10s\n",
+           "No", "From", "To", "Dist(km)", "Cost(LKR)", "Profit", "Charge");
+    printf("--------------------------------------------------------------------------------------------\n");
+
+    for (int i = 0; i < deliveryCount; i++)
+    {
+        int src = deliverySource[i];
+        int dst = deliveryDestination[i];
+        int wt = deliveryWeight[i];
+        int vtype = deliveryVehicle[i];
+        int dist = distances[src][dst];
+
+        float baseCost = dist * vehicleRate[vtype] * (1 + (float)wt / 10000);
+        float fuelUsed = (float)dist / vehicleFuel[vtype];
+        float fuelCost = fuelUsed * FUEL_PRICE;
+        float totalCost = baseCost + fuelCost;
+        float profit = baseCost * 0.25;
+        float customerCharge = totalCost + profit;
+
+        printf("%-5d %-15s %-15s %-10d %-10.2f %-10.2f %-10.2f\n",
+               i + 1, cities[src], cities[dst], dist, totalCost, profit, customerCharge);
+    }
+
+    printf("=============================================================================================\n");
+}
+
 
 
 
