@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <limits.h>
 
 #define MAX_CITIES 30
 #define NAME_CITY 50
@@ -30,6 +31,9 @@ int deliverySource[MAX_DELIVERIES], deliveryDestination[MAX_DELIVERIES], deliver
 int deliveryCount = 0;
 void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_CITIES][NAME_CITY]);
 void printDeliveryReports(char cities[MAX_CITIES][NAME_CITY], int deliveryCount);
+void findBestRoute(int path[], int start, int end, int *minDist, int bestPath[]);
+void findLeastCostRoute(char cities[MAX_CITIES][NAME_CITY], int cityCount);
+
 
 
 int main()
@@ -65,6 +69,7 @@ int main()
             break;
         case 5:
             printDeliveryReports(cities,deliveryCount);
+            findLeastCostRoute(cities, cityCount);
             break;
         case 6:
             printf("Exiting program.\n");
@@ -491,6 +496,83 @@ void printDeliveryReports(char cities[MAX_CITIES][NAME_CITY], int deliveryCount)
 
     printf("=============================================================================================\n");
 }
+
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int totalDistance(int path[], int count) {
+    int total = 0;
+    for (int i = 0; i < count - 1; i++) {
+        total += distances[path[i]][path[i + 1]];
+    }
+    return total;
+}
+
+void findBestRoute(int path[], int start, int end, int *minDist, int bestPath[]) {
+    if (start == end) {
+        int dist = totalDistance(path, end + 1);
+        if (dist < *minDist) {
+            *minDist = dist;
+            for (int i = 0; i <= end; i++) {
+                bestPath[i] = path[i];
+            }
+        }
+        return;
+    }
+
+    for (int i = start; i <= end; i++) {
+        swap(&path[start], &path[i]);
+        findBestRoute(path, start + 1, end, minDist, bestPath);
+        swap(&path[start], &path[i]);
+    }
+}
+
+void findLeastCostRoute(char cities[MAX_CITIES][NAME_CITY], int cityCount) {
+    if (cityCount < 2) {
+        printf("Add 2 cities to find the shortest route.\n");
+        return;
+    }
+
+    int start, end;
+    displayCities(cities, cityCount);
+
+    printf("Enter Start City: ");
+    scanf("%d", &start);
+    printf("Enter Destination City: ");
+    scanf("%d", &end);
+
+    if (start < 1 || start > cityCount || end < 1 || end > cityCount || start == end) {
+        printf("Invalid!\n");
+        return;
+    }
+
+    int citySubset = (cityCount > 4) ? 4 : cityCount;
+    int path[4], bestPath[4];
+    for (int i = 0; i < citySubset; i++)
+        path[i] = i;
+
+    int minDist = INT_MAX;
+    findBestRoute(path, 0, citySubset - 1, &minDist, bestPath);
+
+    printf("\n===========================================\n");
+    printf(" LEAST COST ROUTE INFORMATION\n");
+    printf("------------------------------------------\n");
+    printf("From: %s\n", cities[start - 1]);
+    printf("To: %s\n", cities[end - 1]);
+    printf("Minimum Distance: %d km\n", minDist);
+    printf("Best Path: ");
+    for (int i = 0; i < citySubset; i++) {
+        printf("%s", cities[bestPath[i]]);
+        if (i < citySubset - 1)
+            printf(" ---> ");
+    }
+    printf("\n==========================================\n");
+}
+
 
 
 
