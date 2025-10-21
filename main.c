@@ -1,7 +1,18 @@
+// ================================================
+// Project: Logistics Management System
+// Student: AS20240387
+// Name:P.A.R.Savindi
+// Purpose: To manage deliveries, vehicles, cities,
+//           and calculate costs using C programming
+// ================================================
+
+
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
+#include<limits.h>
 
+//---------Constant Definitions---------
 #define MAX_CITIES 30
 #define NAME_CITY 50
 #define VH_TYPES 3
@@ -9,27 +20,38 @@
 #define FUEL_PRICE 310
 
 
+//---------Global Variables--------------
+char cities[MAX_CITIES][NAME_CITY];
+int cityCount = 0;
+int distances[MAX_CITIES][MAX_CITIES];
+int deliverySource[MAX_DELIVERIES];
+int deliveryDestination[MAX_DELIVERIES];
+int deliveryWeight[MAX_DELIVERIES];
+int deliveryVehicle[MAX_DELIVERIES];
+int deliveryCount = 0;
+
+char vehicleNames[VH_TYPES][20] = {"Van","Truck","Lorry"};
+int vehicleRate[VH_TYPES] = {30,40,50};
+int vehicleCapacity[VH_TYPES] = {1000, 5000, 10000};
+int vehicleSpeed[VH_TYPES] = {60, 80, 100};
+int vehicleFuel[VH_TYPES] = {12, 6, 4};
 
 
+
+//--------Function Prototypes-------------
+int getintInput(const char *ch_1);
 void cityManagement(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void addCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void renameCity(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void removeCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void displayCities(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void readLine(char text[], int size);
+
 void vehicleManagement();
 void deliveryRequest();
-
-
-char cities[MAX_CITIES][NAME_CITY];
-int cityCount = 0;
-
-int distances[MAX_CITIES][MAX_CITIES];
 void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void displayVehicleOption();
-int deliverySource[MAX_DELIVERIES], deliveryDestination[MAX_DELIVERIES], deliveryWeight[MAX_DELIVERIES], deliveryVehicle[MAX_DELIVERIES];
-int deliveryCount = 0;
 void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_CITIES][NAME_CITY]);
 void printDeliveryReports(char cities[MAX_CITIES][NAME_CITY], int deliveryCount);
 void findBestRoute(int path[], int start, int end, int *minDist, int bestPath[]);
@@ -37,12 +59,37 @@ void findLeastCostRoute(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void displayPerformanceReport(char cities[MAX_CITIES][NAME_CITY], int deliveryCount);
 void vehicleUsageReport();
 
+//----------Safe Input Function----------
+int getIntInput(const char *ch_1) {
+    char buffer[50];
+    int value;
+    while(1) {
+        printf("%s", ch_1);
+        if(fgets(buffer, sizeof(buffer), stdin)) {
+            if(sscanf(buffer, "%d", &value) == 1) {
+                return value;
+            } else {
+                printf("Please Enter a number!..\n");
+            }
+        }
+    }
+}
 
+
+//----------Main Menu Function----------
 
 int main()
 {
     int choice;
 
+    printf("\n====================================================\n");
+    printf(" Welcome to the Logistics Management System \n");
+    printf("----------------------------------------------------\n");
+    printf(" Manage your deliveries, cities, and vehicles easily.\n");
+    printf("====================================================\n");
+
+
+    //main menu loop
     while (1)
     {
         printf("\n=== Logistics Management System ===\n");
@@ -54,8 +101,9 @@ int main()
         printf("6. Performance Report\n");
         printf("7. Vehicle Usage Report\n");
         printf("8. Save & Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
+
+
+        choice = getIntInput("Enter your choice: ");
 
         switch (choice)
         {
@@ -92,6 +140,29 @@ int main()
     }
 }
 
+//----------Read Line Function----------
+
+
+void readLine(char text[], int size)
+{
+    int i = 0;
+    char ch;
+    getchar();
+
+    while (i < size - 1)
+    {
+        ch = getchar();
+        if (ch == '\n' || ch == EOF)
+            break;
+        text[i] = ch;
+        i++;
+    }
+    text[i] = '\0';
+}
+
+
+//----------City Management Functions----------
+
 void cityManagement(char cities[MAX_CITIES][NAME_CITY], int *cityCount)
 {
     int choice;
@@ -103,8 +174,7 @@ void cityManagement(char cities[MAX_CITIES][NAME_CITY], int *cityCount)
         printf("3. Remove City\n");
         printf("4. Display Cities\n");
         printf("5. Back to Main Menu\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
+        choice = getIntInput("Enter your choice: ");
 
         switch (choice)
         {
@@ -130,22 +200,7 @@ void cityManagement(char cities[MAX_CITIES][NAME_CITY], int *cityCount)
     while (choice != 5);
 }
 
-void readLine(char text[], int size)
-{
-    int i = 0;
-    char ch;
-    getchar();
 
-    while (i < size - 1)
-    {
-        ch = getchar();
-        if (ch == '\n' || ch == EOF)
-            break;
-        text[i] = ch;
-        i++;
-    }
-    text[i] = '\0';
-}
 
 void addCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount)
 {
@@ -189,9 +244,7 @@ void renameCity(char cities[MAX_CITIES][NAME_CITY], int cityCount)
     }
     displayCities(cities, cityCount);
 
-    int index;
-    printf("Enter city Number to Rename: ");
-    scanf("%d", &index);
+    int index = getIntInput("Enter city Number to Rename: ");
 
     if (index < 1 || index > cityCount)
     {
@@ -214,9 +267,8 @@ void removeCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount)
 
     displayCities(cities, *cityCount);
 
-    int index;
-    printf("Enter city number to remove: ");
-    scanf("%d", &index);
+    int index=getIntInput("Enter city number to remove: ");
+
 
     if (index < 1 || index > *cityCount)
     {
@@ -255,6 +307,11 @@ void displayCities(char cities[MAX_CITIES][NAME_CITY], int cityCount)
     printf("Total Cities: %d\n", cityCount);
 }
 
+
+
+
+//--------Distance Management Function-------
+
 void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount)
 {
     int choice;
@@ -265,8 +322,7 @@ void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount)
         printf("1. Input/Edit Distance\n");
         printf("2. Display Distance Table\n");
         printf("3. Back to Main Menu\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
+        choice = getIntInput("Enter your choice: ");
 
         switch (choice)
         {
@@ -314,13 +370,11 @@ void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount)
         return;
     }
 
-    int from, to, dist;
+
     displayCities(cities,cityCount);
 
-    printf("From city number: ");
-    scanf("%d", &from);
-    printf("To city number: ");
-    scanf("%d", &to);
+    int from = getIntInput("From city number: ");
+    int to = getIntInput("To city number: ");
 
     if(from < 1 || from > cityCount || to < 1 || to > cityCount || from == to)
     {
@@ -328,8 +382,8 @@ void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount)
         return;
     }
 
-    printf("Enter distance (km): ");
-    scanf("%d", &dist);
+    int dist = getIntInput("Enter distance (km): ");
+
 
     distances[from-1][to-1] = dist;
     distances[to-1][from-1] = dist;
@@ -337,11 +391,12 @@ void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount)
 
 }
 
-char vehicleNames[VH_TYPES][20] = {"Van","Truck","Lorry"};
-int vehicleRate[VH_TYPES] = {30,40,50};
-int vehicleCapacity[VH_TYPES] = {1000, 5000, 10000};
-int vehicleSpeed[VH_TYPES] = {60, 80, 100};
-int vehicleFuel[VH_TYPES] = {12, 6, 4};
+
+
+
+
+//--------Vehicle Management Function-----------
+
 
 void vehicleManagement()
 {
@@ -371,8 +426,7 @@ void displayVehicleOption()
         printf("%d: %s\n", i + 1, vehicleNames[i]);
     }
 
-    printf("Enter your Vehicle choice: ");
-    scanf("%d", &select);
+   select = getIntInput("Enter your Vehicle choice: ");
 
     if (select < 1 || select > VH_TYPES)
     {
@@ -389,7 +443,12 @@ void displayVehicleOption()
     printf("Fuel Efficiency: %d km/l\n", vehicleFuel[index]);
 }
 
-void deliveryRequest()
+
+
+
+//-------Delivery Request Function----------
+
+void deliveryRequest(char cities[MAX_CITIES][NAME_CITY], int cityCount)
 {
 
     if(cityCount < 2)
@@ -403,25 +462,22 @@ void deliveryRequest()
         return;
     }
 
-    int source, dest, weight, vhtype;
-    displayCities(cities,cityCount);
 
-    printf("Enter start city number: ");
-    scanf("%d", &source);
-    printf("Enter destination city number: ");
-    scanf("%d", &dest);
+    displayCities(cities,cityCount);
+    int source = getIntInput("Enter start city number: ");
+    int dest = getIntInput("Enter destination city number: ");
+
     if(source < 1 || source > cityCount || dest < 1 || dest > cityCount || source == dest)
     {
         printf("Invalid start or destination city!\n");
         return;
     }
 
-    printf("Enter package weight in Kg: ");
-    scanf("%d", &weight);
+    int weight = getIntInput("Enter package weight (kg): ");
 
     displayVehicleOption();
-    printf("Enter vehicle number: ");
-    scanf("%d", &vhtype);
+    int vhtype = getIntInput("Enter vehicle number: ");
+
     if(vhtype < 1 || vhtype > VH_TYPES)
     {
         printf("Invalid vehicle selection!\n");
@@ -440,6 +496,12 @@ void deliveryRequest()
     deliveryCount++;
     printf("Delivery Request Added successfully!\n");
 }
+
+
+
+//----Cost,Time and Fuel Calculation(Delivery Cost Calculation)------
+
+
 void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_CITIES][NAME_CITY])
 {
     int dist = distances[source][dest];
@@ -471,6 +533,11 @@ void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_C
     printf("Estimated Time: %.2f hours\n", time);
     printf("======================================================\n");
 }
+
+
+
+//------Delivery and Performance Reports----------
+
 
 void printDeliveryReports(char cities[MAX_CITIES][NAME_CITY], int deliveryCount)
 {
@@ -551,11 +618,9 @@ void findLeastCostRoute(char cities[MAX_CITIES][NAME_CITY], int cityCount) {
 
     int start, end;
     displayCities(cities, cityCount);
+    start = getIntInput("Enter Starting City: ");
+    end = getIntInput("Enter Destination City: ");
 
-    printf("Enter Start City: ");
-    scanf("%d", &start);
-    printf("Enter Destination City: ");
-    scanf("%d", &end);
 
     if (start < 1 || start > cityCount || end < 1 || end > cityCount || start == end) {
         printf("Invalid!\n");
@@ -637,6 +702,9 @@ void displayPerformanceReport(char cities[MAX_CITIES][NAME_CITY], int deliveryCo
            cities[deliverySource[shortIndex]], cities[deliveryDestination[shortIndex]], shortest);
     printf("======================================================\n");
 }
+
+
+//Vehicle Usage Report Function
 
 void vehicleUsageReport()
 {
