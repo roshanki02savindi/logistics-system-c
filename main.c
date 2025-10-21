@@ -35,6 +35,7 @@ void printDeliveryReports(char cities[MAX_CITIES][NAME_CITY], int deliveryCount)
 void findBestRoute(int path[], int start, int end, int *minDist, int bestPath[]);
 void findLeastCostRoute(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void displayPerformanceReport(char cities[MAX_CITIES][NAME_CITY], int deliveryCount);
+void vehicleUsageReport();
 
 
 
@@ -51,7 +52,8 @@ int main()
         printf("4. Delivery Request\n");
         printf("5. Reports\n");
         printf("6. Performance Report\n");
-        printf("7. Save & Exit\n");
+        printf("7. Vehicle Usage Report\n");
+        printf("8. Save & Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
@@ -78,6 +80,10 @@ int main()
             displayPerformanceReport(cities,deliveryCount);
             break;
         case 7:
+            vehicleUsageReport();
+            break;
+
+        case 8:
             printf("Exiting program.\n");
             return 0;
         default:
@@ -630,6 +636,29 @@ void displayPerformanceReport(char cities[MAX_CITIES][NAME_CITY], int deliveryCo
     printf("Shortest Route : %s -> %s (%d km)\n",
            cities[deliverySource[shortIndex]], cities[deliveryDestination[shortIndex]], shortest);
     printf("======================================================\n");
+}
+
+void vehicleUsageReport()
+{
+    int count[VH_TYPES] = {0};
+
+    for (int i = 0; i < deliveryCount; i++)
+        count[deliveryVehicle[i]]++;
+
+    printf("\n==============================\n");
+    printf(" VEHICLE USAGE REPORT\n");
+    printf("------------------------------\n");
+    for (int i = 0; i < VH_TYPES; i++)
+        printf("%-10s : %d times\n", vehicleNames[i], count[i]);
+
+    int mostUsed = 0;
+    for (int i = 1; i < VH_TYPES; i++)
+        if (count[i] > count[mostUsed])
+            mostUsed = i;
+
+    printf("------------------------------\n");
+    printf("Most Used Vehicle: %s\n", vehicleNames[mostUsed]);
+    printf("==============================\n");
 }
 
 
