@@ -8,9 +8,10 @@
 
 
 #include <stdio.h>
-#include <limits.h>
 #include <stdlib.h>
-#include<limits.h>
+#include <limits.h>
+
+
 
 //---------Constant Definitions---------
 #define MAX_CITIES 30
@@ -39,7 +40,7 @@ int vehicleFuel[VH_TYPES] = {12, 6, 4};
 
 
 //--------Function Prototypes-------------
-int getintInput(const char *ch_1);
+int getIntInput(const char *ch_1);
 void cityManagement(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void addCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount);
 void renameCity(char cities[MAX_CITIES][NAME_CITY], int cityCount);
@@ -48,7 +49,7 @@ void displayCities(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void readLine(char text[], int size);
 
 void vehicleManagement();
-void deliveryRequest();
+void deliveryRequest(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void distanceManagement(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void inputEditDistance(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void displayVehicleOption();
@@ -58,6 +59,8 @@ void findBestRoute(int path[], int start, int end, int *minDist, int bestPath[])
 void findLeastCostRoute(char cities[MAX_CITIES][NAME_CITY], int cityCount);
 void displayPerformanceReport(char cities[MAX_CITIES][NAME_CITY], int deliveryCount);
 void vehicleUsageReport();
+void loadData();
+void saveData();
 
 //----------Safe Input Function----------
 int getIntInput(const char *ch_1) {
@@ -80,6 +83,7 @@ int getIntInput(const char *ch_1) {
 
 int main()
 {
+    loadData();
     int choice;
 
     printf("\n====================================================\n");
@@ -132,6 +136,7 @@ int main()
             break;
 
         case 8:
+            saveData();
             printf("Exiting program.\n");
             return 0;
         default:
@@ -145,19 +150,12 @@ int main()
 
 void readLine(char text[], int size)
 {
-    int i = 0;
-    char ch;
-    getchar();
-
-    while (i < size - 1)
-    {
-        ch = getchar();
-        if (ch == '\n' || ch == EOF)
-            break;
-        text[i] = ch;
-        i++;
+    if (fgets(text, size, stdin)) {
+        size_t len = 0;
+        while (text[len] != '\0') len++;
+        if (len > 0 && text[len - 1] == '\n')
+            text[len - 1] = '\0';
     }
-    text[i] = '\0';
 }
 
 
@@ -215,7 +213,7 @@ void addCity(char cities[MAX_CITIES][NAME_CITY], int *cityCount)
     for (int i = 0; i < *cityCount; i++)
     {
         int same = 1, j = 0;
-        while (cities[i][j] != '\0' || cities[*cityCount][j] != '\0')
+        while (cities[i][j] != '\0' && cities[*cityCount][j] != '\0')
         {
             if (cities[i][j] != cities[*cityCount][j])
             {
@@ -495,6 +493,7 @@ void deliveryRequest(char cities[MAX_CITIES][NAME_CITY], int cityCount)
     deliveryVehicle[deliveryCount] = vhtype - 1;
     deliveryCount++;
     printf("Delivery Request Added successfully!\n");
+    calDelivery(source-1, dest-1, weight, vhtype-1, cities);
 }
 
 
@@ -515,7 +514,7 @@ void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_C
     float time = (float)dist / vehicleSpeed[vhtype];
 
     printf("\n =====================================================\n");
-    printf("  DELIVERY COST ESTIMATION  ");
+    printf("  DELIVERY COST ESTIMATION  \n");
     printf("------------------------------------------------------\n");
     printf("From : %s\n", cities[source]);
     printf("To: %s\n", cities[dest]);
@@ -523,7 +522,7 @@ void calDelivery(int source, int dest, int weight, int vhtype, char cities[MAX_C
     printf("Vehicle: %s\n", vehicleNames[vhtype]);
     printf("Weight: %d kg\n", weight);
     printf("------------------------------------------------------\n");
-    printf("Base Cost: %d × %d × (1 + %d/10000) = %.2f LKR\n",
+    printf("Base Cost: %d * %d * (1 + %d/10000) = %.2f LKR\n",
            dist, vehicleRate[vhtype], weight, baseCost);
     printf("Fuel Used: %.2f L\n", fuelUsed);
     printf("Fuel Cost: %.2f LKR\n", fuelCost);
@@ -704,7 +703,7 @@ void displayPerformanceReport(char cities[MAX_CITIES][NAME_CITY], int deliveryCo
 }
 
 
-//Vehicle Usage Report Function
+//------Vehicle Usage Report Function----------
 
 void vehicleUsageReport()
 {
@@ -729,6 +728,51 @@ void vehicleUsageReport()
     printf("==============================\n");
 }
 
+
+//----------file handling Part----------
+void saveData() {
+    FILE *fp = fopen("logistics.dat", "wb");
+    if (!fp) {
+        printf("Error saving data!\n");
+        return;
+    }
+
+    fwrite(&cityCount, sizeof(int), 1, fp);
+    fwrite(cities, sizeof(cities[0]), cityCount, fp);
+
+    fwrite(distances, sizeof(distances[0]), MAX_CITIES, fp);
+
+    fwrite(&deliveryCount, sizeof(int), 1, fp);
+    fwrite(deliverySource, sizeof(int), deliveryCount, fp);
+    fwrite(deliveryDestination, sizeof(int), deliveryCount, fp);
+    fwrite(deliveryWeight, sizeof(int), deliveryCount, fp);
+    fwrite(deliveryVehicle, sizeof(int), deliveryCount, fp);
+
+    fclose(fp);
+    printf("Data saved successfully!\n");
+}
+
+void loadData() {
+    FILE *fp = fopen("logistics.dat", "rb");
+    if (!fp) {
+        printf("No previous data found, starting fresh.\n");
+        return;
+    }
+
+    fread(&cityCount, sizeof(int), 1, fp);
+    fread(cities, sizeof(cities[0]), cityCount, fp);
+
+    fread(distances, sizeof(distances[0]), MAX_CITIES, fp);
+
+    fread(&deliveryCount, sizeof(int), 1, fp);
+    fread(deliverySource, sizeof(int), deliveryCount, fp);
+    fread(deliveryDestination, sizeof(int), deliveryCount, fp);
+    fread(deliveryWeight, sizeof(int), deliveryCount, fp);
+    fread(deliveryVehicle, sizeof(int), deliveryCount, fp);
+
+    fclose(fp);
+    printf("Data loaded successfully!\n");
+}
 
 
 
